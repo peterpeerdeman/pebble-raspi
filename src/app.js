@@ -34,93 +34,144 @@ var parseTopFeed = function(data, quantity) {
 };
 
 var menu = new UI.Menu({
-    sections: [{
-      items: [{
-        title: 'Lifely'
-      },{
-        title: 'TOP'
-      }, {
-        title: 'MPD',
-      }, {
-        title: 'Lights',
-      }]
+  sections: [{
+    items: [{
+      title: 'Lifely'
+    },{
+      title: 'TOP'
+    }, {
+      title: 'MPD',
+    }, {
+      title: 'Lights',
     }]
-  });
-  menu.on('select', function(e) {
+  }]
+});
+menu.on('select', function(e) {
+
+  //Lifely selected
+  if ( e.itemIndex === 0) {
+
+    ajax({
+      url:'http://lifely.nl/api/team.json',
+      type:'json'
+    },
+         function(data) {
+           // Create an array of Menu items
+           var menuItems = parseLifelyFeed(data);
+
+           // Construct Menu to show to user
+           var resultsMenu = new UI.Menu({
+             sections: [{
+               title: 'Teammembers',
+               items: menuItems
+             }]
+           });
+           resultsMenu.show();
+         }
+        );
+
+  } else if ( e.itemIndex === 1) {
+    //TOP selected
+    ajax({
+      url:'http://peerdeman1.no-ip.org:3000/api/top',
+      type:'json'
+    },
+         function(data) {
+           var menuItems = parseTopFeed(data, 10);
+           var resultsMenu = new UI.Menu({
+             sections: [{
+               title: 'Top',
+               items: menuItems
+             }]
+           });
+           resultsMenu.show();
+         }
+        );
+  } else if ( e.itemIndex === 2) {
+    // mpd selected
     
-    //Lifely selected
-    if ( e.itemIndex === 0) {
-      
-ajax({
-    url:'http://lifely.nl/api/team.json',
-    type:'json'
-  },
-  function(data) {
-    // Create an array of Menu items
-    var menuItems = parseLifelyFeed(data);
- 
-    // Construct Menu to show to user
-    var resultsMenu = new UI.Menu({
+    var mpdMenu = new UI.Menu({
       sections: [{
-        title: 'Teammembers',
-        items: menuItems
+        items: [{
+          title: 'currentsong'
+        },{
+          title: 'play'
+        }, {
+          title: 'pause',
+        }, {
+          title: 'next',
+        }]
       }]
     });
-    resultsMenu.show();
-  }
-);
+    
+    mpdMenu.on('select', function(e) {
+      if(e.itemIndex === 0) {
+        // currentsong
+        ajax({
+            url:'http://peerdeman1.no-ip.org:3000/api/mpd/currentsong',
+            type:'json'
+          },
+          function(data) {
+            var currentsong = new UI.Card({
+              title: data.Artist + ' - ' + data.Title,
+              subtitle: data.Album
+            });
       
-    } else if ( e.itemIndex === 1) {
-      //TOP selected
+           currentsong.show();
+          }
+        );
+      } else if (e.itemIndex === 1) {
+        // play
+        ajax({
+            url:'http://peerdeman1.no-ip.org:3000/api/mpd/play',
+            method: 'POST',
+            type:'json'
+          },
+          function(data) {
+            var card = new UI.Card({
+              title: 'OK'
+            });
       
-      // Show splash screen while waiting for data
-//       var splashWindow = new UI.Window();
-       
-//       // Text element to inform user
-//       var text = new UI.Text({
-//         position: new Vector2(0, 0),
-//         size: new Vector2(144, 168),
-//         text:'Downloading top data...',
-//         font:'GOTHIC_28_BOLD',
-//         color:'black',
-//         textOverflow:'wrap',
-//         textAlign:'center',
-//       	backgroundColor:'white'
-//       });
-       
-//       // Add to splashWindow and show
-//       splashWindow.add(text);
-//       splashWindow.show();
+            card.show();
+          }
+        );
+      } else if (e.itemIndex === 2) {
+        // pause
+        ajax({
+            url:'http://peerdeman1.no-ip.org:3000/api/mpd/pause',
+            method: 'POST',
+            type:'json'
+          },
+          function(data) {
+            var card = new UI.Card({
+              title: 'OK'
+            });
       
-ajax({
-  url:'http://peerdeman1.no-ip.org:3000/api/top',
-    type:'json'
-  },
-  function(data) {
-    var menuItems = parseTopFeed(data, 10);
-    var resultsMenu = new UI.Menu({
-      sections: [{
-        title: 'Top',
-        items: menuItems
-      }]
+            card.show();
+          }
+        );
+      } else if (e.itemIndex === 3) {
+        // next
+        ajax({
+            url:'http://peerdeman1.no-ip.org:3000/api/mpd/next',
+            method: 'POST',
+            type:'json'
+          },
+          function(data) {
+            var card = new UI.Card({
+              title: 'OK'
+            });
+      
+            card.show();
+          }
+        );
+      }
     });
-    resultsMenu.show();
-  }
-);
+    mpdMenu.show();
       
-    } else {
-      Vibe.vibrate('short');
-    }
-    //console.log('Selected item #' + e.itemIndex + ' of section #' + e.sectionIndex);
-    //console.log('The item is titled "' + e.item.title + '"');
-  });
-  menu.show();
+  } else {
+    Vibe.vibrate('short');
+  }
+});
 
-// var main = new UI.Card({
-//   title: 'Pebble.js',
-//   icon: 'images/menu_icon.png',
-//   subtitle: 'Hello World!',
-//   body: 'Press any button.'
-// });
-
-// main.show();
+menu.show();
