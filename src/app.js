@@ -100,6 +100,8 @@ menu.on('select', function(e) {
           title: 'pause',
         }, {
           title: 'next',
+        }, {
+          title: 'stop',
         }]
       }]
     });
@@ -128,11 +130,7 @@ menu.on('select', function(e) {
             type:'json'
           },
           function(data) {
-            var card = new UI.Card({
-              title: 'OK'
-            });
-      
-            card.show();
+            Vibe.vibrate('long');
           }
         );
       } else if (e.itemIndex === 2) {
@@ -143,11 +141,7 @@ menu.on('select', function(e) {
             type:'json'
           },
           function(data) {
-            var card = new UI.Card({
-              title: 'OK'
-            });
-      
-            card.show();
+            Vibe.vibrate('long');
           }
         );
       } else if (e.itemIndex === 3) {
@@ -158,11 +152,18 @@ menu.on('select', function(e) {
             type:'json'
           },
           function(data) {
-            var card = new UI.Card({
-              title: 'OK'
-            });
-      
-            card.show();
+            Vibe.vibrate('long');
+          }
+        );
+      } else if (e.itemIndex === 4) {
+        // stop
+        ajax({
+            url:'http://peerdeman1.no-ip.org:3000/api/mpd/stop',
+            method: 'POST',
+            type:'json'
+          },
+          function(data) {
+            Vibe.vibrate('long');
           }
         );
       }
