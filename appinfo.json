@@ -1,7 +1,7 @@
 {
     "appKeys": {},
     "capabilities": [
-        ""
+        "configurable"
     ],
     "companyName": "peterpeerdeman@gmail.com",
     "longName": "raspi",
