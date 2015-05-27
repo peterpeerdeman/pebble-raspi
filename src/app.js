@@ -3,13 +3,11 @@
  */
 
 var UI = require('ui');
-var Vector2 = require('vector2');
 var Vibe = require('ui/vibe');
 var ajax = require('ajax');
 var Settings = require('settings');
 
 var initialized = false;
-var options = {};
 
 Pebble.addEventListener("ready", function() {
   console.log("ready called!");
@@ -326,7 +324,7 @@ var renderMPDMenu = function() {
     }
   });
   mpdMenu.show();
-}
+};
 
 var menu = new UI.Menu({
   sections: [{
