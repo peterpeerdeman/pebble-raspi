@@ -9,6 +9,8 @@ var Settings = require('settings');
 
 var initialized = false;
 
+var RASPAPI_URL = 'http://peerdeman1.no-ip.org:3000'
+
 Pebble.addEventListener("ready", function() {
   console.log("ready called!");
   initialized = true;
@@ -145,6 +147,17 @@ var parseTopFeed = function(data, quantity) {
   return items;
 };
 
+var parseTemperaturesFeed = function(data) {
+  var items = [];
+  for(var i = 0; i < data.length; i++) {
+    items.push({
+      title: data[i].temperature + '° celsius',
+      subtitle: data[i].date
+    });
+  }
+  return items;
+};
+
 var parseLifelyServerFeed = function(data) {
   var items = [];
   for(var i = 0; i < data.length; i++) {
@@ -265,7 +278,7 @@ var renderMPDMenu = function() {
     if(e.itemIndex === 0) {
       // currentsong
       ajax({
-        url:'http://peerdeman1.no-ip.org:3000/api/mpd/currentsong',
+        url:RASPAPI_URL + '/api/mpd/currentsong',
         type:'json'
       },
            function(data) {
@@ -280,7 +293,7 @@ var renderMPDMenu = function() {
     } else if (e.itemIndex === 1) {
       // play
       ajax({
-        url:'http://peerdeman1.no-ip.org:3000/api/mpd/play',
+        url:RASPAPI_URL + '/api/mpd/play',
         method: 'POST',
         type:'json'
       },
@@ -291,7 +304,7 @@ var renderMPDMenu = function() {
     } else if (e.itemIndex === 2) {
       // pause
       ajax({
-        url:'http://peerdeman1.no-ip.org:3000/api/mpd/pause',
+        url: RASPAPI_URL +'/api/mpd/pause',
         method: 'POST',
         type:'json'
       },
@@ -302,7 +315,7 @@ var renderMPDMenu = function() {
     } else if (e.itemIndex === 3) {
       // next
       ajax({
-        url:'http://peerdeman1.no-ip.org:3000/api/mpd/next',
+        url:RASPAPI_URL + '/api/mpd/next',
         method: 'POST',
         type:'json'
       },
@@ -313,7 +326,7 @@ var renderMPDMenu = function() {
     } else if (e.itemIndex === 4) {
       // stop
       ajax({
-        url:'http://peerdeman1.no-ip.org:3000/api/mpd/stop',
+        url: RASPAPI_URL + '/api/mpd/stop',
         method: 'POST',
         type:'json'
       },
@@ -326,6 +339,55 @@ var renderMPDMenu = function() {
   mpdMenu.show();
 };
 
+var renderHomeMenu = function() {
+  var homeMenu = new UI.Menu({
+    sections: [{
+      items: [{
+        title: 'current temp'
+      },{
+        title: 'day temp'
+      }]
+    }]
+  });
+
+  homeMenu.on('select', function(e) {
+    if(e.itemIndex === 0) {
+      // current
+      ajax({
+        url: RASPAPI_URL + '/api/weather/temperatures?limit=1',
+        type:'json'
+      },
+           function(data) {
+             console.log('data',data);
+             var currenttemp = new UI.Card({
+               title: data[0].temperature + '° celsius',
+               subtitle: data[0].date
+             });
+
+             currenttemp.show();
+           }
+          );
+    } else if (e.itemIndex === 1) {
+      // daytemp
+      ajax({
+        url: RASPAPI_URL + '/api/weather/temperatures',
+        type:'json'
+      },
+       function(data) {
+         var menuItems = parseTemperaturesFeed(data);
+         var resultsMenu = new UI.Menu({
+           sections: [{
+             title: 'Day temperatures',
+             items: menuItems
+           }]
+         });
+         resultsMenu.show();
+       });
+    } 
+  });
+  homeMenu.show();
+};
+
 var menu = new UI.Menu({
   sections: [{
     items: [{
@@ -334,9 +396,9 @@ var menu = new UI.Menu({
       title: 'TOP'
     }, {
       title: 'MPD',
-    }/*, {
-      title: 'Lights',
-    }*/
+    }, {
+      title: 'Home',
+    }
     ]
   }]
 });
@@ -350,7 +412,7 @@ menu.on('select', function(e) {
   } else if ( e.itemIndex === 1) {
     //TOP selected
     ajax({
-      url:'http://peerdeman1.no-ip.org:3000/api/top',
+      url: RASPAPI_URL + '/api/top',
       type:'json'
     },
          function(data) {
@@ -367,6 +429,10 @@ menu.on('select', function(e) {
   } else if ( e.itemIndex === 2) {
     // mpd selected
     renderMPDMenu();
+      
+  }  else if ( e.itemIndex === 3) {
+    // home selected
+    renderHomeMenu();
       
   } else {
     Vibe.vibrate('short');
