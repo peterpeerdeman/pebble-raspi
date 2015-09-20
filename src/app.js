@@ -149,7 +149,7 @@ var parseTopFeed = function(data, quantity) {
 
 var parseTemperaturesFeed = function(data) {
   var items = [];
-  for(var i = 0; i < data.length; i++) {
+  for(var i = data.length - 1; i >= 0; i--) {
     items.push({
       title: data[i].temperature + '° celsius',
       subtitle: data[i].date
