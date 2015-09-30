@@ -343,6 +343,10 @@ var renderHomeMenu = function() {
   var homeMenu = new UI.Menu({
     sections: [{
       items: [{
+        title: 'lights on'
+      },{
+        title: 'lights off'
+      },{
         title: 'current temp'
       },{
         title: 'day temp'
@@ -352,6 +356,24 @@ var renderHomeMenu = function() {
 
   homeMenu.on('select', function(e) {
     if(e.itemIndex === 0) {
+      // lights on
+      ajax({
+        url: RASPAPI_URL + '/api/lights/on',
+        type:'json'
+      },
+      function(data) {
+         Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 1) {
+      // lights off
+      ajax({
+        url: RASPAPI_URL + '/api/lights/off',
+        type:'json'
+      },
+      function(data) {
+         Vibe.vibrate('short');
+      });
+    } else if(e.itemIndex === 2) {
       // current
       ajax({
         url: RASPAPI_URL + '/api/weather/temperatures?limit=1',
@@ -367,7 +389,7 @@ var renderHomeMenu = function() {
              currenttemp.show();
            }
           );
-    } else if (e.itemIndex === 1) {
+    } else if (e.itemIndex === 3) {
       // daytemp
       ajax({
         url: RASPAPI_URL + '/api/weather/temperatures',
