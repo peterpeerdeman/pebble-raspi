@@ -33,6 +33,10 @@
     },
     "sdkVersion": "3",
     "shortName": "raspi",
+    "targetPlatforms": [
+        "aplite",
+        "basalt"
+    ],
     "uuid": "258b669e-7781-41cd-a92f-530693fcc73a",
     "versionCode": 1,
     "versionLabel": "1.0",

@@ -9,7 +9,7 @@ var Settings = require('settings');
 
 var initialized = false;
 
-var RASPAPI_URL = 'http://peerdeman1.no-ip.org:3000'
+var RASPAPI_URL = 'http://peerdeman1.no-ip.org:3000';
 
 Pebble.addEventListener("ready", function() {
   console.log("ready called!");
@@ -185,6 +185,17 @@ var parseLifelyMusicFeed = function(data) {
   return items;
 };
 
+var parseLightsFeed = function(data) {
+  var items = [];
+  for(var i = 0; i < data.length; i++) {
+    items.push({
+      title: data[i].name,
+      subtitle: 'on: ' + data[i].state.on + ', bri: ' + data[i].state.bri
+    });
+  }
+  return items;
+};
+
 var renderLifelyMenu = function() {
   var lifelyMenu = new UI.Menu({
     sections: [{
@@ -339,14 +350,10 @@ var renderMPDMenu = function() {
   mpdMenu.show();
 };
 
-var renderHomeMenu = function() {
-  var homeMenu = new UI.Menu({
+var renderTemperatureMenu = function() {
+  var temperatureMenu = new UI.Menu({
     sections: [{
       items: [{
-        title: 'lights on'
-      },{
-        title: 'lights off'
-      },{
         title: 'current temp'
       },{
         title: 'day temp'
@@ -354,26 +361,8 @@ var renderHomeMenu = function() {
     }]
   });
 
-  homeMenu.on('select', function(e) {
+  temperatureMenu.on('select', function(e) {
     if(e.itemIndex === 0) {
-      // lights on
-      ajax({
-        url: RASPAPI_URL + '/api/lights/on',
-        type:'json'
-      },
-      function(data) {
-         Vibe.vibrate('short');
-      });
-    } else if (e.itemIndex === 1) {
-      // lights off
-      ajax({
-        url: RASPAPI_URL + '/api/lights/off',
-        type:'json'
-      },
-      function(data) {
-         Vibe.vibrate('short');
-      });
-    } else if(e.itemIndex === 2) {
       // current
       ajax({
         url: RASPAPI_URL + '/api/weather/temperatures?limit=1',
@@ -389,7 +378,7 @@ var renderHomeMenu = function() {
              currenttemp.show();
            }
           );
-    } else if (e.itemIndex === 3) {
+    } else if (e.itemIndex === 1) {
       // daytemp
       ajax({
         url: RASPAPI_URL + '/api/weather/temperatures',
@@ -407,7 +396,59 @@ var renderHomeMenu = function() {
        });
     } 
   });
-  homeMenu.show();
+  temperatureMenu.show();
+};
+
+var renderLightsMenu = function() {
+  var lightsMenu = new UI.Menu({
+    sections: [{
+      items: [{
+        title: 'lights status'
+      },{
+        title: 'lights on'
+      },{
+        title: 'lights off'
+      }]
+    }]
+  });
+
+  lightsMenu.on('select', function(e) {
+    if(e.itemIndex === 0) {
+      // lights status
+      ajax({
+        url: RASPAPI_URL + '/api/lights/lights/details',
+        type:'json'
+      }, function(data) {
+         var menuItems = parseLightsFeed(data);
+         var resultsMenu = new UI.Menu({
+           sections: [{
+             title: 'Lights',
+             items: menuItems
+           }]
+         });
+         resultsMenu.show();
+       });
+    } else if(e.itemIndex === 1) {
+      // lights on
+      ajax({
+        url: RASPAPI_URL + '/api/lights/on',
+        type:'json'
+      },
+      function(data) {
+         Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 2) {
+      // lights off
+      ajax({
+        url: RASPAPI_URL + '/api/lights/off',
+        type:'json'
+      },
+      function(data) {
+         Vibe.vibrate('short');
+      });
+    }
+  });
+  lightsMenu.show();
 };
 
 var menu = new UI.Menu({
@@ -419,9 +460,10 @@ var menu = new UI.Menu({
     }, {
       title: 'MPD',
     }, {
-      title: 'Home',
-    }
-    ]
+      title: 'Temperature',
+    }, {
+      title: 'Lights',
+    }]
   }]
 });
 menu.on('select', function(e) {
@@ -432,7 +474,6 @@ menu.on('select', function(e) {
     renderLifelyMenu();
 
   } else if ( e.itemIndex === 1) {
-    //TOP selected
     ajax({
       url: RASPAPI_URL + '/api/top',
       type:'json'
@@ -449,12 +490,13 @@ menu.on('select', function(e) {
          }
         );
   } else if ( e.itemIndex === 2) {
-    // mpd selected
     renderMPDMenu();
       
   }  else if ( e.itemIndex === 3) {
-    // home selected
-    renderHomeMenu();
+    renderTemperatureMenu();
+      
+  }  else if ( e.itemIndex === 4) {
+    renderLightsMenu();
       
   } else {
     Vibe.vibrate('short');
