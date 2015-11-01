@@ -408,6 +408,16 @@ var renderLightsMenu = function() {
         title: 'lights on'
       },{
         title: 'lights off'
+      },{
+        title: 'randomcolor'
+      },{
+        title: 'randomcolors'
+      },{
+        title: 'lights colorloop'
+      },{
+        title: 'lights bri inc'
+      },{
+        title: 'lights bri dec'
       }]
     }]
   });
@@ -441,6 +451,47 @@ var renderLightsMenu = function() {
       // lights off
       ajax({
         url: RASPAPI_URL + '/api/lights/off',
+        type:'json'
+      },
+      function(data) {
+         Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 3) {
+      // lights off
+      ajax({
+        url: RASPAPI_URL + '/api/lights/randomcolor',
+        type:'json'
+      },
+      function(data) {
+         Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 4) {
+      ajax({
+        url: RASPAPI_URL + '/api/lights/randomcolors',
+        type:'json'
+      },
+      function(data) {
+         Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 5) {
+      ajax({
+        url: RASPAPI_URL + '/api/lights/colorloop',
+        type:'json'
+      },
+      function(data) {
+         Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 6) {
+      ajax({
+        url: RASPAPI_URL + '/api/lights/brightness/inc',
+        type:'json'
+      },
+      function(data) {
+         Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 7) {
+      ajax({
+        url: RASPAPI_URL + '/api/lights/brightness/dec',
         type:'json'
       },
       function(data) {
