@@ -354,9 +354,13 @@ var renderTemperatureMenu = function() {
   var temperatureMenu = new UI.Menu({
     sections: [{
       items: [{
-        title: 'current temp'
+        title: 'current temp inside'
       },{
-        title: 'day temp'
+        title: 'day temp inside'
+      },{
+        title: 'current temp outside'
+      },{
+        title: 'day temp outside'
       }]
     }]
   });
@@ -388,7 +392,39 @@ var renderTemperatureMenu = function() {
          var menuItems = parseTemperaturesFeed(data);
          var resultsMenu = new UI.Menu({
            sections: [{
-             title: 'Day temperatures',
+             title: 'Inside temperatures',
+             items: menuItems
+           }]
+         });
+         resultsMenu.show();
+       });
+    } else if(e.itemIndex === 2) {
+      // current
+      ajax({
+        url: RASPAPI_URL + '/api/weather/temperatures?location=outside&limit=1',
+        type:'json'
+      },
+           function(data) {
+             console.log('data',data);
+             var currenttemp = new UI.Card({
+               title: data[0].temperature + '° celsius',
+               subtitle: data[0].date
+             });
+
+             currenttemp.show();
+           }
+          );
+    } else if (e.itemIndex === 3) {
+      // daytemp
+      ajax({
+        url: RASPAPI_URL + '/api/weather/temperatures?location=outside',
+        type:'json'
+      },
+       function(data) {
+         var menuItems = parseTemperaturesFeed(data);
+         var resultsMenu = new UI.Menu({
+           sections: [{
+             title: 'Outside temperatures',
              items: menuItems
            }]
          });
