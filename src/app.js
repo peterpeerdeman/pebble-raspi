@@ -9,7 +9,7 @@ var Settings = require('settings');
 
 var initialized = false;
 
-var RASPAPI_URL = 'http://peerdeman1.no-ip.org:3000';
+var RASPAPI_URL = '';
 
 Pebble.addEventListener("ready", function() {
   console.log("ready called!");
