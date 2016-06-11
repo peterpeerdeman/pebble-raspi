@@ -538,6 +538,98 @@ var renderLightsMenu = function() {
   lightsMenu.show();
 };
 
+var parseSolarStatus = function(data) {
+  var items = [{
+    title: 'Power',
+    subtitle: data.powerGeneration + ' W'
+  }, {
+    title: 'Voltage',
+    subtitle: data.voltage + ' V'
+  }, {
+    title: 'Energy generated',
+    subtitle: data.energyGeneration + ' kWh'
+  }, {
+    title: 'Time',
+    subtitle: data.date + ' ' + data.time
+  }];
+  return items;
+};
+
+var parseSolarStatus = function(data) {
+  var items = [{
+    title: 'Power',
+    subtitle: data.powerGeneration + ' W'
+  }, {
+    title: 'Voltage',
+    subtitle: data.voltage + ' V'
+  }, {
+    title: 'Energy generated',
+    subtitle: data.energyGeneration + ' Wh'
+  }, {
+    title: 'Time',
+    subtitle: data.time + ' ' + data.date
+  }];
+  return items;
+};
+
+var parseSolarOutput = function(data) {
+  var items = [];
+  for(var i = 0; i < data.length; i++) {
+    items.push({
+      title: data[i].date,
+      subtitle: data[i].energyGenerated + ' Wh, ' + data[i].peakPower + ' W'
+    });
+  }
+  return items;
+};
+
+var renderSolarMenu = function() {
+  var solarMenu = new UI.Menu({
+    sections: [{
+      items: [{
+        title: 'solar status'
+      },{
+        title: 'solar output'
+      }]
+    }]
+  });
+
+  solarMenu.on('select', function(e) {
+    if(e.itemIndex === 0) {
+      // solar status
+      ajax({
+        url: RASPAPI_URL + '/api/solar/status',
+        type:'json'
+      }, function(data) {
+         var menuItems = parseSolarStatus(data);
+         var resultsMenu = new UI.Menu({
+           sections: [{
+             title: 'Status',
+             items: menuItems
+           }]
+         });
+         resultsMenu.show();
+       });
+    } else if(e.itemIndex === 1) {
+      // solar output
+      ajax({
+        url: RASPAPI_URL + '/api/solar/output',
+        type:'json'
+      }, function(data) {
+         var menuItems = parseSolarOutput(data);
+         var resultsMenu = new UI.Menu({
+           sections: [{
+             title: 'Output',
+             items: menuItems
+           }]
+         });
+         resultsMenu.show();
+       });  
+    }
+  });
+  solarMenu.show();
+};
+
 var menu = new UI.Menu({
   sections: [{
     items: [{
@@ -550,6 +642,8 @@ var menu = new UI.Menu({
       title: 'Temperature',
     }, {
       title: 'Lights',
+    }, {
+      title: 'Solar',
     }]
   }]
 });
@@ -584,6 +678,9 @@ menu.on('select', function(e) {
       
   }  else if ( e.itemIndex === 4) {
     renderLightsMenu();
+      
+  }  else if ( e.itemIndex === 5) {
+    renderSolarMenu();
       
   } else {
     Vibe.vibrate('short');
