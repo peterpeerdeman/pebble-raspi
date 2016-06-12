@@ -547,23 +547,6 @@ var parseSolarStatus = function(data) {
     subtitle: data.voltage + ' V'
   }, {
     title: 'Energy generated',
-    subtitle: data.energyGeneration + ' kWh'
-  }, {
-    title: 'Time',
-    subtitle: data.date + ' ' + data.time
-  }];
-  return items;
-};
-
-var parseSolarStatus = function(data) {
-  var items = [{
-    title: 'Power',
-    subtitle: data.powerGeneration + ' W'
-  }, {
-    title: 'Voltage',
-    subtitle: data.voltage + ' V'
-  }, {
-    title: 'Energy generated',
     subtitle: data.energyGeneration + ' Wh'
   }, {
     title: 'Time',
