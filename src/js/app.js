@@ -6,120 +6,20 @@ var UI = require('ui');
 var Vibe = require('ui/vibe');
 var ajax = require('ajax');
 var Settings = require('settings');
+var Base64 = require('base64');
+var Feature = require('platform/feature');
 
 var initialized = false;
 
 var RASPAPI_URL = '';
+var REALROYALTYFREE_URL = '';
 
 Pebble.addEventListener("ready", function() {
   console.log("ready called!");
   initialized = true;
 });
 
-var Base64 = {
-    // private property
-    _keyStr : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-    // public method for encoding
-    encode : function (input) {
-        var output = "";
-        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-        var i = 0;
-        input = Base64._utf8_encode(input);
-        while (i < input.length) {
-            chr1 = input.charCodeAt(i++);
-            chr2 = input.charCodeAt(i++);
-            chr3 = input.charCodeAt(i++);
-            enc1 = chr1 >> 2;
-            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-            enc4 = chr3 & 63;
-            if (isNaN(chr2)) {
-                enc3 = enc4 = 64;
-            } else if (isNaN(chr3)) {
-                enc4 = 64;
-            }
-            output = output +
-            this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) +
-            this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
-        }
-        return output;
-    },
-    // public method for decoding
-    decode : function (input) {
-        var output = "";
-        var chr1, chr2, chr3;
-        var enc1, enc2, enc3, enc4;
-        var i = 0;
-        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
-        while (i < input.length) {
-            enc1 = this._keyStr.indexOf(input.charAt(i++));
-            enc2 = this._keyStr.indexOf(input.charAt(i++));
-            enc3 = this._keyStr.indexOf(input.charAt(i++));
-            enc4 = this._keyStr.indexOf(input.charAt(i++));
-            chr1 = (enc1 << 2) | (enc2 >> 4);
-            chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-            chr3 = ((enc3 & 3) << 6) | enc4;
-            output = output + String.fromCharCode(chr1);
-            if (enc3 != 64) {
-                output = output + String.fromCharCode(chr2);
-            }
-            if (enc4 != 64) {
-                output = output + String.fromCharCode(chr3);
-            }
-        }
-        output = Base64._utf8_decode(output);
-        return output;
-    },
-    // private method for UTF-8 encoding
-    _utf8_encode : function (string) {
-        string = string.replace(/\r\n/g,"\n");
-        var utftext = "";
-        for (var n = 0; n < string.length; n++) {
-            var c = string.charCodeAt(n);
-            if (c < 128) {
-                utftext += String.fromCharCode(c);
-            }
-            else if((c > 127) && (c < 2048)) {
-                utftext += String.fromCharCode((c >> 6) | 192);
-                utftext += String.fromCharCode((c & 63) | 128);
-            }
-            else {
-                utftext += String.fromCharCode((c >> 12) | 224);
-                utftext += String.fromCharCode(((c >> 6) & 63) | 128);
-                utftext += String.fromCharCode((c & 63) | 128);
-            }
-        }
-        return utftext;
-    },
-    // private method for UTF-8 decoding
-    _utf8_decode : function (utftext) {
-        var string = "";
-        var i = 0;
-        var c = 0;
-//        var c1 = 0;
-        var c2 = 0;
-        var c3 = 0;
-        while ( i < utftext.length ) {
-            c = utftext.charCodeAt(i);
-            if (c < 128) {
-                string += String.fromCharCode(c);
-                i++;
-            }
-            else if((c > 191) && (c < 224)) {
-                c2 = utftext.charCodeAt(i+1);
-                string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
-                i += 2;
-            }
-            else {
-                c2 = utftext.charCodeAt(i+1);
-                c3 = utftext.charCodeAt(i+2);
-                string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-                i += 3;
-            }
-        }
-        return string;
-    }
-};
+
 
 var parseLifelyMemberFeed = function(data, quantity) {
   var items = [];
@@ -198,6 +98,7 @@ var parseLightsFeed = function(data) {
 
 var renderLifelyMenu = function() {
   var lifelyMenu = new UI.Menu({
+    highlightBackgroundColor: Feature.color('imperial-purple', 'black'),
     sections: [{
       items: [{
         title: 'Servers'
@@ -566,6 +467,79 @@ var parseSolarOutput = function(data) {
   return items;
 };
 
+var renderTOP = function() {
+  ajax({
+      url: RASPAPI_URL + '/api/top',
+      type:'json'
+    },
+       function(data) {
+         var menuItems = parseTopFeed(data, 10);
+         var resultsMenu = new UI.Menu({
+           sections: [{
+             title: 'Top',
+             items: menuItems
+           }]
+         });
+         resultsMenu.show();
+       }
+      );
+};
+
+var renderXMLFeed = function(url) {
+  ajax({
+        url: url,
+        type:'xml'
+      }, function(data) {
+        var menuItems = data.match(/<title>(.*?)<\/title>/g).map(function(title) {
+          return {
+            subtitle: title.substr(7, title.length-15)
+          };
+        });
+         var resultsMenu = new UI.Menu({
+           sections: [{
+             items: menuItems
+           }]
+         });
+         resultsMenu.on('select', function(e) {
+            var appDetails = new UI.Card({
+              body: e.item.subtitle,
+              scrollable: true
+            });
+            
+            appDetails.show();
+         });
+         resultsMenu.show();
+       });
+};
+
+var renderWebMenu = function() {
+  var webMenu = new UI.Menu({
+    highlightBackgroundColor: Feature.color('blue-moon', 'black'),
+    sections: [{
+      items: [{
+        title: 'nu'
+      },{
+        title: 'verge'
+      },{
+        title: 'pitchfork'
+      }]
+    }]
+  });
+
+  webMenu.on('select', function(e) {
+    if(e.itemIndex === 0) {
+      // nu
+      renderXMLFeed('http://www.nu.nl/rss');
+    } else if(e.itemIndex === 1) {
+      // verge
+      renderXMLFeed('http://www.theverge.com/rss/index.xml');
+    } else if(e.itemIndex === 2) {
+      renderXMLFeed('http://pitchfork.com/rss/reviews/albums/');
+    }
+  });
+  webMenu.show();
+};
+
 var renderSolarMenu = function() {
   var solarMenu = new UI.Menu({
     sections: [{
@@ -613,64 +587,211 @@ var renderSolarMenu = function() {
   solarMenu.show();
 };
 
-var menu = new UI.Menu({
+var renderHomeMenu = function() {
+    var homeMenu = new UI.Menu({
+      
+      highlightBackgroundColor: Feature.color('jaeger-green', 'black'),
+      sections: [{
+        items: [{
+          title: 'Lights',
+        },{
+          title: 'Solar',
+        },{
+          title: 'Music',
+        },{
+          title: 'Temperature',
+        },{
+          title: 'TOP'
+        }]
+      }]
+  });
+  homeMenu.on('select', function(e) {
+    if ( e.itemIndex === 0) {
+      renderLightsMenu();
+    } else if ( e.itemIndex === 1) {
+      renderSolarMenu();
+    } else if ( e.itemIndex === 2) {
+      renderMPDMenu();
+    } else if ( e.itemIndex === 3) {
+      renderTemperatureMenu();
+    } else if ( e.itemIndex === 4) {
+      renderTOP();   
+    }
+  });
+  
+  homeMenu.show();
+};
+
+var parseRRFFeed = function(data) {
+  var items = [];
+  console.log(data.counts);
+  for (var property in data.counts) {
+    items.push({
+      title: property,
+      subtitle: data.counts[property]
+    });
+  }
+  
+  // separator
+  items.push({
+      title: '--------'
+  });
+  
+  data.medias.forEach(function(media) {
+    items.push({
+      title: media.title,
+      subtitle: media.preview_count
+    });
+  });
+  return items;
+};
+
+var renderRealRoyaltyFree = function() {
+  ajax({
+      url: REALROYALTYFREE_URL,
+      type:'json'
+    },
+       function(data) {
+         var menuItems = parseRRFFeed(data);
+         var resultsMenu = new UI.Menu({
+           sections: [{
+             title: 'RealRoyaltyFree',
+             items: menuItems
+           }]
+         });
+         resultsMenu.show();
+       }
+      );
+};
+
+var renderRecordfairs = function() {
+  ajax({
+      url: 'http://recordfairs.nl/fairs?limit=10',
+      type:'json'
+    },
+       function(data) {
+         var menuItems = data.map(function(fair) {
+           return {
+             title: fair.city + ' - ' + fair.location,
+             subtitle: fair.startDate
+           };
+         });
+         var resultsMenu = new UI.Menu({
+           sections: [{
+             title: 'RealRoyaltyFree',
+             items: menuItems
+           }]
+         });
+         
+         resultsMenu.on('select', function(e) {
+            var appDetails = new UI.Card({
+              title: e.item.title,
+              body: e.item.subtitle + '\n' + e.item.body,
+              scrollable: true
+            });
+            
+            appDetails.show();
+          });
+         
+         resultsMenu.show();
+       }
+      );
+};
+
+var renderWisdoms = function() {
+  ajax({
+      url: 'http://wisdoms.nl/wisdoms.json',
+      type:'json'
+    },
+       function(data) {
+         var menuItems = data.entries.map(function(wisdom) {
+           return {
+             title: wisdom.author,
+             subtitle: wisdom.quote
+           };
+         });
+         
+         menuItems.unshift({
+           title: 'total wisdoms',
+           subtitle: data.total_entries
+         });
+         
+         var resultsMenu = new UI.Menu({
+           sections: [{
+             title: 'RealRoyaltyFree',
+             items: menuItems
+           }]
+         });
+         
+         resultsMenu.on('select', function(e) {
+            var appDetails = new UI.Card({
+              title: e.item.title,
+              body: e.item.subtitle + '\n' + e.item.body,
+              scrollable: true
+            });
+            
+            appDetails.show();
+          });
+         
+         resultsMenu.show();
+       }
+      );
+};
+
+var renderProjectsMenu = function() {
+    var projectsMenu = new UI.Menu({
+      highlightBackgroundColor: Feature.color('sunset-orange', 'black'),
+      sections: [{
+        items: [{
+          title: 'RealRoyaltyFree',
+        },{
+          title: 'Recordfairs',
+        },{
+          title: 'Wisdoms',
+        }]
+      }]
+    });
+    projectsMenu.on('select', function(e) {
+      if ( e.itemIndex === 0) {
+        renderRealRoyaltyFree();
+      } else if ( e.itemIndex === 1) {
+        renderRecordfairs();
+      } else if ( e.itemIndex === 2) {
+        renderWisdoms();
+      }
+    });
+    
+    projectsMenu.show();
+};
+
+var mainMenu = new UI.Menu({
   sections: [{
     items: [{
-      title: 'Lifely'
+      title: 'Home'
     },{
-      title: 'TOP'
-    }, {
-      title: 'MPD',
-    }, {
-      title: 'Temperature',
-    }, {
-      title: 'Lights',
-    }, {
-      title: 'Solar',
+      title: 'Work'
+    },{
+      title: 'Projects'
+    },{
+      title: 'Web',
     }]
   }]
 });
-menu.on('select', function(e) {
 
+mainMenu.on('select', function(e) {
   //Lifely selected
   if ( e.itemIndex === 0) {
-    
-    renderLifelyMenu();
-
+    renderHomeMenu();
   } else if ( e.itemIndex === 1) {
-    ajax({
-      url: RASPAPI_URL + '/api/top',
-      type:'json'
-    },
-         function(data) {
-           var menuItems = parseTopFeed(data, 10);
-           var resultsMenu = new UI.Menu({
-             sections: [{
-               title: 'Top',
-               items: menuItems
-             }]
-           });
-           resultsMenu.show();
-         }
-        );
+    renderLifelyMenu();
   } else if ( e.itemIndex === 2) {
-    renderMPDMenu();
-      
-  }  else if ( e.itemIndex === 3) {
-    renderTemperatureMenu();
-      
-  }  else if ( e.itemIndex === 4) {
-    renderLightsMenu();
-      
-  }  else if ( e.itemIndex === 5) {
-    renderSolarMenu();
-      
-  } else {
-    Vibe.vibrate('short');
+    renderProjectsMenu();
+  } else if ( e.itemIndex === 3) {
+    renderWebMenu();
   }
 });
 
-menu.show();
+mainMenu.show();
 
 Pebble.addEventListener('showConfiguration', function(e) {
   // Show config page
