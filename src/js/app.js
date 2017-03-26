@@ -19,8 +19,6 @@ Pebble.addEventListener("ready", function() {
   initialized = true;
 });
 
-
-
 var parseLifelyMemberFeed = function(data, quantity) {
   var items = [];
   for(var i = 0; i < data.length; i++) {
@@ -118,8 +116,7 @@ var renderLifelyMenu = function() {
         headers: {
           'Authorization': header
         }
-      },
-      function(data) {
+      }, function(data) {
         var menuItems = parseLifelyServerFeed(data);
         var resultsMenu = new UI.Menu({
           sections: [{
@@ -169,6 +166,37 @@ var renderLifelyMenu = function() {
   lifelyMenu.show();
 };
 
+var renderMPDPlaylists = function() {
+  ajax({
+      url: RASPAPI_URL + '/api/mpd/playlists',
+      type:'json'
+  }, function(data) {
+    var menuItems = data.map(function(playlist) {
+      return {
+        title: playlist
+      };
+    });
+    var resultsMenu = new UI.Menu({
+      sections: [{
+        title: 'MPD - Playlists',
+        items: menuItems
+      }]
+    });
+
+    resultsMenu.on('select', function(e) {
+      ajax({
+        url:RASPAPI_URL + '/api/mpd/playlists/' + encodeURIComponent(e.item.title) + '/load',
+        method: 'POST',
+        type:'json'
+      }, function(data) {
+        Vibe.vibrate('short');
+      });
+
+    });
+    resultsMenu.show();
+  });
+};
+
 var renderMPDMenu = function() {
   var mpdMenu = new UI.Menu({
     sections: [{
@@ -182,6 +210,10 @@ var renderMPDMenu = function() {
         title: 'next',
       }, {
         title: 'stop',
+      }, {
+        title: 'clear',
+      }, {
+        title: 'playlists',
       }]
     }]
   });
@@ -192,60 +224,61 @@ var renderMPDMenu = function() {
       ajax({
         url:RASPAPI_URL + '/api/mpd/currentsong',
         type:'json'
-      },
-           function(data) {
-             var currentsong = new UI.Card({
-               title: data.Artist + ' - ' + data.Title,
-               subtitle: data.Album
-             });
-
-             currentsong.show();
-           }
-          );
+      }, function(data) {
+        var currentsong = new UI.Card({
+          title: data.Artist + ' - ' + data.Title,
+          subtitle: data.Album
+        });
+        currentsong.show();
+      });
     } else if (e.itemIndex === 1) {
       // play
       ajax({
         url:RASPAPI_URL + '/api/mpd/play',
         method: 'POST',
         type:'json'
-      },
-           function(data) {
-             Vibe.vibrate('long');
-           }
-          );
+      }, function(data) {
+        Vibe.vibrate('short');
+      });
     } else if (e.itemIndex === 2) {
       // pause
       ajax({
         url: RASPAPI_URL +'/api/mpd/pause',
         method: 'POST',
         type:'json'
-      },
-           function(data) {
-             Vibe.vibrate('long');
-           }
-          );
+      }, function(data) {
+        Vibe.vibrate('short');
+      });
     } else if (e.itemIndex === 3) {
       // next
       ajax({
         url:RASPAPI_URL + '/api/mpd/next',
         method: 'POST',
         type:'json'
-      },
-           function(data) {
-             Vibe.vibrate('long');
-           }
-          );
+      }, function(data) {
+        Vibe.vibrate('short');
+      });
     } else if (e.itemIndex === 4) {
       // stop
       ajax({
         url: RASPAPI_URL + '/api/mpd/stop',
         method: 'POST',
         type:'json'
-      },
-           function(data) {
-             Vibe.vibrate('long');
-           }
-          );
+      }, function(data) {
+             Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 5) {
+      // stop
+      ajax({
+        url: RASPAPI_URL + '/api/mpd/clear',
+        method: 'POST',
+        type:'json'
+      }, function(data) {
+             Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 6) {
+      // playlists
+      renderMPDPlaylists();
     }
   });
   mpdMenu.show();
