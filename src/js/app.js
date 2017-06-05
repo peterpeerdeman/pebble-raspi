@@ -13,6 +13,7 @@ var initialized = false;
 
 var RASPAPI_URL = '';
 var REALROYALTYFREE_URL = '';
+var RASPAPI_AUTHHEADER = '';
 
 Pebble.addEventListener("ready", function() {
   console.log("ready called!");
@@ -169,7 +170,10 @@ var renderLifelyMenu = function() {
 var renderMPDPlaylists = function() {
   ajax({
       url: RASPAPI_URL + '/api/mpd/playlists',
-      type:'json'
+      type:'json',
+      headers: {
+        'Authorization': RASPAPI_AUTHHEADER
+      }
   }, function(data) {
     var menuItems = data.map(function(playlist) {
       return {
@@ -187,7 +191,10 @@ var renderMPDPlaylists = function() {
       ajax({
         url:RASPAPI_URL + '/api/mpd/playlists/' + encodeURIComponent(e.item.title) + '/load',
         method: 'POST',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       }, function(data) {
         Vibe.vibrate('short');
       });
@@ -223,7 +230,10 @@ var renderMPDMenu = function() {
       // currentsong
       ajax({
         url:RASPAPI_URL + '/api/mpd/currentsong',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       }, function(data) {
         var currentsong = new UI.Card({
           title: data.Artist + ' - ' + data.Title,
@@ -236,7 +246,10 @@ var renderMPDMenu = function() {
       ajax({
         url:RASPAPI_URL + '/api/mpd/play',
         method: 'POST',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       }, function(data) {
         Vibe.vibrate('short');
       });
@@ -245,7 +258,10 @@ var renderMPDMenu = function() {
       ajax({
         url: RASPAPI_URL +'/api/mpd/pause',
         method: 'POST',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       }, function(data) {
         Vibe.vibrate('short');
       });
@@ -254,7 +270,10 @@ var renderMPDMenu = function() {
       ajax({
         url:RASPAPI_URL + '/api/mpd/next',
         method: 'POST',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       }, function(data) {
         Vibe.vibrate('short');
       });
@@ -263,7 +282,10 @@ var renderMPDMenu = function() {
       ajax({
         url: RASPAPI_URL + '/api/mpd/stop',
         method: 'POST',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       }, function(data) {
              Vibe.vibrate('short');
       });
@@ -272,7 +294,10 @@ var renderMPDMenu = function() {
       ajax({
         url: RASPAPI_URL + '/api/mpd/clear',
         method: 'POST',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       }, function(data) {
              Vibe.vibrate('short');
       });
@@ -304,7 +329,10 @@ var renderTemperatureMenu = function() {
       // current
       ajax({
         url: RASPAPI_URL + '/api/weather/temperatures?limit=1',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       },
            function(data) {
              console.log('data',data);
@@ -320,7 +348,10 @@ var renderTemperatureMenu = function() {
       // daytemp
       ajax({
         url: RASPAPI_URL + '/api/weather/temperatures',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       },
        function(data) {
          var menuItems = parseTemperaturesFeed(data);
@@ -336,7 +367,10 @@ var renderTemperatureMenu = function() {
       // current
       ajax({
         url: RASPAPI_URL + '/api/weather/temperatures?location=outside&limit=1',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       },
            function(data) {
              console.log('data',data);
@@ -352,7 +386,10 @@ var renderTemperatureMenu = function() {
       // daytemp
       ajax({
         url: RASPAPI_URL + '/api/weather/temperatures?location=outside',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       },
        function(data) {
          var menuItems = parseTemperaturesFeed(data);
@@ -397,7 +434,10 @@ var renderLightsMenu = function() {
       // lights status
       ajax({
         url: RASPAPI_URL + '/api/lights/lights/details',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       }, function(data) {
          var menuItems = parseLightsFeed(data);
          var resultsMenu = new UI.Menu({
@@ -412,7 +452,10 @@ var renderLightsMenu = function() {
       // lights on
       ajax({
         url: RASPAPI_URL + '/api/lights/on',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       },
       function(data) {
          Vibe.vibrate('short');
@@ -421,7 +464,10 @@ var renderLightsMenu = function() {
       // lights off
       ajax({
         url: RASPAPI_URL + '/api/lights/off',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       },
       function(data) {
          Vibe.vibrate('short');
@@ -430,7 +476,10 @@ var renderLightsMenu = function() {
       // lights off
       ajax({
         url: RASPAPI_URL + '/api/lights/randomcolor',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       },
       function(data) {
          Vibe.vibrate('short');
@@ -438,7 +487,10 @@ var renderLightsMenu = function() {
     } else if (e.itemIndex === 4) {
       ajax({
         url: RASPAPI_URL + '/api/lights/randomcolors',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       },
       function(data) {
          Vibe.vibrate('short');
@@ -446,7 +498,10 @@ var renderLightsMenu = function() {
     } else if (e.itemIndex === 5) {
       ajax({
         url: RASPAPI_URL + '/api/lights/colorloop',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       },
       function(data) {
          Vibe.vibrate('short');
@@ -454,7 +509,10 @@ var renderLightsMenu = function() {
     } else if (e.itemIndex === 6) {
       ajax({
         url: RASPAPI_URL + '/api/lights/brightness/inc',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       },
       function(data) {
          Vibe.vibrate('short');
@@ -462,7 +520,10 @@ var renderLightsMenu = function() {
     } else if (e.itemIndex === 7) {
       ajax({
         url: RASPAPI_URL + '/api/lights/brightness/dec',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       },
       function(data) {
          Vibe.vibrate('short');
@@ -470,6 +531,199 @@ var renderLightsMenu = function() {
     }
   });
   lightsMenu.show();
+};
+
+var renderMediaplayerMenu = function() {
+  var mediaplayerMenu = new UI.Menu({
+    sections: [{
+      items: [{
+        title: 'quit'
+      },{
+        title: 'up'
+      }, {
+        title: 'down',
+      }, {
+        title: 'left',
+      }, {
+        title: 'right',
+      }, {
+        title: 'select',
+      }, {
+        title: 'pause',
+      }]
+    }]
+  });
+
+  mediaplayerMenu.on('select', function(e) {
+    if(e.itemIndex === 0) {
+      // quit
+      ajax({
+        url:RASPAPI_URL + '/api/mediaplayer/quit',
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
+      }, function(data) {
+        Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 1) {
+      // up
+      ajax({
+        url:RASPAPI_URL + '/api/mediaplayer/up',
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
+      }, function(data) {
+        Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 2) {
+      // down
+      ajax({
+        url: RASPAPI_URL +'/api/mediaplayer/down',
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
+      }, function(data) {
+        Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 3) {
+      // left
+      ajax({
+        url:RASPAPI_URL + '/api/mediaplayer/left',
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
+      }, function(data) {
+        Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 4) {
+      // right
+      ajax({
+        url: RASPAPI_URL + '/api/mediaplayer/right',
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
+      }, function(data) {
+        Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 5) {
+      // select
+      ajax({
+        url: RASPAPI_URL + '/api/mediaplayer/select',
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
+      }, function(data) {
+        Vibe.vibrate('short');
+      });
+    } else if (e.itemIndex === 6) {
+      // pause
+      ajax({
+        url: RASPAPI_URL + '/api/mediaplayer/pause',
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
+      }, function(data) {
+        Vibe.vibrate('short');
+      });
+    }
+  });
+  mediaplayerMenu.show();
+};
+
+var parseTorrentsFeed = function(data) {
+  var items = [];
+  for(var i = 0; i < data.length; i++) {
+    items.push({
+      title: data[i].name,
+      subtitle: data[i].status + ' ' + data[i].rateDownload + ' kbps, ' + data[i].rateUpload + ' kbps'
+    });
+  }
+  return items;
+};
+
+var renderDownloadsMenu = function() {
+  var downloadsMenu = new UI.Menu({
+    sections: [{
+      items: [{
+        title: 'all'
+      },{
+        title: 'active'
+      },{
+        title: 'stats'
+      }]
+    }]
+  });
+
+  downloadsMenu.on('select', function(e) {
+    if(e.itemIndex === 0) {
+      // all
+      ajax({
+        url: RASPAPI_URL + '/api/downloads/all',
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
+      }, function(data) {
+         var menuItems = parseTorrentsFeed(data);
+         var resultsMenu = new UI.Menu({
+           sections: [{
+             title: 'All Torrents',
+             items: menuItems
+           }]
+         });
+         resultsMenu.show();
+       });
+    } else if(e.itemIndex === 1) {
+      // active
+      ajax({
+        url: RASPAPI_URL + '/api/downloads/active',
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
+      }, function(data) {
+         var menuItems = parseTorrentsFeed(data);
+         var resultsMenu = new UI.Menu({
+           sections: [{
+             title: 'Active Torrents',
+             items: menuItems
+           }]
+         });
+         resultsMenu.show();
+       });
+    } else if (e.itemIndex === 2) {
+      // stats
+      ajax({
+        url: RASPAPI_URL + '/api/downloads/sessionstats',
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
+      }, function(data) {
+         var resultsMenu = new UI.Menu({
+           sections: [{
+             title: 'Active Torrents',
+             items: [{
+               title: 'Downloadspeed',
+               subtitle: data.downloadSpeed
+             },{
+               title: 'Uploadspeed',
+               subtitle: data.uploadSpeed
+             }]
+           }]
+         });
+         resultsMenu.show();
+       });
+    }
+  });
+  downloadsMenu.show();
 };
 
 var parseSolarStatus = function(data) {
@@ -503,7 +757,10 @@ var parseSolarOutput = function(data) {
 var renderTOP = function() {
   ajax({
       url: RASPAPI_URL + '/api/top',
-      type:'json'
+      type:'json',
+      headers: {
+        'Authorization': RASPAPI_AUTHHEADER
+      }
     },
        function(data) {
          var menuItems = parseTopFeed(data, 10);
@@ -589,7 +846,10 @@ var renderSolarMenu = function() {
       // solar status
       ajax({
         url: RASPAPI_URL + '/api/solar/status',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       }, function(data) {
          var menuItems = parseSolarStatus(data);
          var resultsMenu = new UI.Menu({
@@ -604,7 +864,10 @@ var renderSolarMenu = function() {
       // solar output
       ajax({
         url: RASPAPI_URL + '/api/solar/output',
-        type:'json'
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
       }, function(data) {
          var menuItems = parseSolarOutput(data);
          var resultsMenu = new UI.Menu({
@@ -635,6 +898,10 @@ var renderHomeMenu = function() {
           title: 'Temperature',
         },{
           title: 'TOP'
+        },{
+          title: 'Mediaplayer'
+        },{
+          title: 'Downloads'
         }]
       }]
   });
@@ -649,6 +916,10 @@ var renderHomeMenu = function() {
       renderTemperatureMenu();
     } else if ( e.itemIndex === 4) {
       renderTOP();   
+    } else if ( e.itemIndex === 5) {
+      renderMediaplayerMenu();   
+    } else if ( e.itemIndex === 6) {
+      renderDownloadsMenu();   
     }
   });
   
