@@ -95,6 +95,18 @@ var parseLightsFeed = function(data) {
   return items;
 };
 
+var parseScenesFeed = function(data) {
+  var items = [];
+  for(var i = 0; i < data.length; i++) {
+    items.push({
+      title: data[i].name,
+      subtitle: data[i].lastupdated,
+      id: data[i].id
+    });
+  }
+  return items;
+};
+
 var renderLifelyMenu = function() {
   var lifelyMenu = new UI.Menu({
     highlightBackgroundColor: Feature.color('imperial-purple', 'black'),
@@ -425,6 +437,8 @@ var renderLightsMenu = function() {
         title: 'lights bri inc'
       },{
         title: 'lights bri dec'
+      },{
+        title: 'scenes'
       }]
     }]
   });
@@ -528,6 +542,37 @@ var renderLightsMenu = function() {
       function(data) {
          Vibe.vibrate('short');
       });
+    } else if (e.itemIndex === 8) {
+      // scenes
+      ajax({
+        url: RASPAPI_URL + '/api/lights/scenes',
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
+      },
+      function(data) {
+         var menuItems = parseScenesFeed(data);
+         var resultsMenu = new UI.Menu({
+           sections: [{
+             title: 'Scenes',
+             items: menuItems
+           }]
+         });
+        resultsMenu.on('select', function(e) {
+            ajax({
+              url:RASPAPI_URL + '/api/lights/scenes/' + encodeURIComponent(e.item.id) + '/activate',
+              type:'json',
+              headers: {
+                'Authorization': RASPAPI_AUTHHEADER
+              }
+            }, function(data) {
+              Vibe.vibrate('short');
+            });
+      
+          });
+         resultsMenu.show();
+      });
     }
   });
   lightsMenu.show();
@@ -558,7 +603,7 @@ var renderMediaplayerMenu = function() {
     if(e.itemIndex === 0) {
       // quit
       ajax({
-        url:RASPAPI_URL + '/api/mediaplayer/quit',
+        url:RASPAPI_URL + '/api/mediacenter/quit',
         type:'json',
         headers: {
           'Authorization': RASPAPI_AUTHHEADER
@@ -569,7 +614,7 @@ var renderMediaplayerMenu = function() {
     } else if (e.itemIndex === 1) {
       // up
       ajax({
-        url:RASPAPI_URL + '/api/mediaplayer/up',
+        url:RASPAPI_URL + '/api/mediacenter/up',
         type:'json',
         headers: {
           'Authorization': RASPAPI_AUTHHEADER
@@ -580,7 +625,7 @@ var renderMediaplayerMenu = function() {
     } else if (e.itemIndex === 2) {
       // down
       ajax({
-        url: RASPAPI_URL +'/api/mediaplayer/down',
+        url: RASPAPI_URL +'/api/mediacenter/down',
         type:'json',
         headers: {
           'Authorization': RASPAPI_AUTHHEADER
@@ -591,7 +636,7 @@ var renderMediaplayerMenu = function() {
     } else if (e.itemIndex === 3) {
       // left
       ajax({
-        url:RASPAPI_URL + '/api/mediaplayer/left',
+        url:RASPAPI_URL + '/api/mediacenter/left',
         type:'json',
         headers: {
           'Authorization': RASPAPI_AUTHHEADER
@@ -602,7 +647,7 @@ var renderMediaplayerMenu = function() {
     } else if (e.itemIndex === 4) {
       // right
       ajax({
-        url: RASPAPI_URL + '/api/mediaplayer/right',
+        url: RASPAPI_URL + '/api/mediacenter/right',
         type:'json',
         headers: {
           'Authorization': RASPAPI_AUTHHEADER
@@ -613,7 +658,7 @@ var renderMediaplayerMenu = function() {
     } else if (e.itemIndex === 5) {
       // select
       ajax({
-        url: RASPAPI_URL + '/api/mediaplayer/select',
+        url: RASPAPI_URL + '/api/mediacenter/select',
         type:'json',
         headers: {
           'Authorization': RASPAPI_AUTHHEADER
@@ -624,7 +669,7 @@ var renderMediaplayerMenu = function() {
     } else if (e.itemIndex === 6) {
       // pause
       ajax({
-        url: RASPAPI_URL + '/api/mediaplayer/pause',
+        url: RASPAPI_URL + '/api/mediacenter/pause',
         type:'json',
         headers: {
           'Authorization': RASPAPI_AUTHHEADER
@@ -648,6 +693,48 @@ var parseTorrentsFeed = function(data) {
   return items;
 };
 
+var renderAvailableDownloadsMenu = function(data) {
+  var downloadItems = [];
+  for(var i = 0; i < data.length; i++) {
+    downloadItems.push({
+      title: data[i].name,
+      subtitle: 's: ' + data[i].seeders + ' date: ' + data[i].uploadDate,
+      magnetLink: data[i].magnetLink
+    });
+  }
+  var availableDownloadsMenu = new UI.Menu({
+    sections: [{
+      items: downloadItems
+    }]
+  });
+  availableDownloadsMenu.on('select', function(e) {
+    var appDetails = new UI.Card({
+       body: e.item.title,
+      scrollable: true
+    });
+    appDetails.show();
+  });
+  
+  availableDownloadsMenu.on('longSelect', function(e) {
+    var magnetLink = e.item.magnetLink;
+    ajax({
+      url: RASPAPI_URL + '/api/downloads/add-url',
+      type:'json',
+      headers: {
+        'Authorization': RASPAPI_AUTHHEADER
+      },
+      method: 'post',
+      data: {
+        url: magnetLink
+      }
+    }, function (data) {
+        Vibe.vibrate('short');
+        availableDownloadsMenu.hide();
+    });
+  });
+  availableDownloadsMenu.show();
+};
+
 var renderDownloadsMenu = function() {
   var downloadsMenu = new UI.Menu({
     sections: [{
@@ -657,6 +744,8 @@ var renderDownloadsMenu = function() {
         title: 'active'
       },{
         title: 'stats'
+      },{
+        title: 'search and add'
       }]
     }]
   });
@@ -720,6 +809,50 @@ var renderDownloadsMenu = function() {
            }]
          });
          resultsMenu.show();
+       });
+    } else if (e.itemIndex === 3) {
+      // search and add
+      ajax({
+        url: RASPAPI_URL + '/api/downloads/keywords',
+        type:'json',
+        headers: {
+          'Authorization': RASPAPI_AUTHHEADER
+        }
+      }, function(data) {
+         var keywordItems = [];
+         for(var i = 0; i < data.length; i++) {
+            keywordItems.push({
+              title: data[i].name
+            });
+          }
+         var keywordsMenu = new UI.Menu({
+           sections: [{
+             title: 'Search Keywords',
+             items: keywordItems
+           }]
+         });
+         keywordsMenu.on('select', function(e) {
+            var selectedKeyword = e.item.title;
+            
+            ajax({
+              url: RASPAPI_URL + '/api/downloads/search',
+              type:'json',
+              method: 'post',
+              headers: {
+                'Authorization': RASPAPI_AUTHHEADER
+              },
+              data: {
+                query: selectedKeyword
+              }
+            }, function (data) {
+              renderAvailableDownloadsMenu(data);
+            }, function(err) {
+              console.log(err);
+            });
+         });
+        
+         keywordsMenu.show();
+           
        });
     }
   });
