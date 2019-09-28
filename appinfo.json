@@ -1,52 +1,54 @@
 {
-    "appKeys": {},
-    "capabilities": [
-        "configurable"
-    ],
-    "companyName": "peterpeerdeman@gmail.com",
-    "longName": "raspi",
-    "projectType": "pebblejs",
-    "resources": {
-        "media": [
-            {
-                "file": "images/menu_icon.png",
-                "name": "IMAGE_MENU_ICON",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/logo_splash.png",
-                "name": "IMAGE_LOGO_SPLASH",
-                "type": "bitmap"
-            },
-            {
-                "file": "images/tile_splash.png",
-                "name": "IMAGE_TILE_SPLASH",
-                "type": "bitmap"
-            },
-            {
-                "file": "fonts/UbuntuMono-Regular.ttf",
-                "name": "MONO_FONT_14",
-                "type": "font"
-            },
-            {
-                "file": "images/menu",
-                "menuIcon": true,
-                "name": "IMAGES_MENU",
-                "type": "bitmap"
-            }
-        ]
-    },
-    "sdkVersion": "3",
-    "shortName": "raspi",
-    "targetPlatforms": [
-        "aplite",
-        "basalt"
-    ],
-    "uuid": "258b669e-7781-41cd-a92f-530693fcc73a",
-    "versionCode": 1,
-    "versionLabel": "1.0",
-    "watchapp": {
-        "hiddenApp": false,
-        "watchface": false
-    }
+  "appKeys": {},
+  "capabilities": [
+    "configurable"
+  ],
+  "companyName": "peterpeerdeman@gmail.com",
+  "longName": "raspi",
+  "resources": {
+    "media": [
+      {
+        "file": "images/menu_icon.png",
+        "name": "IMAGE_MENU_ICON",
+        "type": "bitmap"
+      },
+      {
+        "file": "images/logo_splash.png",
+        "name": "IMAGE_LOGO_SPLASH",
+        "type": "bitmap"
+      },
+      {
+        "file": "images/tile_splash.png",
+        "name": "IMAGE_TILE_SPLASH",
+        "type": "bitmap"
+      },
+      {
+        "file": "fonts/UbuntuMono-Regular.ttf",
+        "name": "MONO_FONT_14",
+        "type": "font"
+      },
+      {
+        "file": "images/menu",
+        "menuIcon": true,
+        "name": "IMAGES_MENU",
+        "type": "bitmap"
+      }
+    ]
+  },
+  "sdkVersion": "3",
+  "shortName": "raspi",
+  "targetPlatforms": [
+    "aplite",
+    "basalt",
+    "chalk",
+    "diorite",
+    "emery"
+  ],
+  "uuid": "133215f0-cf20-4c05-997b-3c9be5a64e5b",
+  "versionCode": 1,
+  "versionLabel": "1.0",
+  "watchapp": {
+    "hiddenApp": false,
+    "watchface": false
+  }
 }

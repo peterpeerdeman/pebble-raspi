@@ -1,0 +1,16 @@
+var Config = {
+    RASPAPI_URL: '',
+    RASPAPI_AUTHHEADER: '',
+    RECORDFAIRS_URL: '',
+    WORK_URL: '',
+    WISDOMS_URL: '',
+    WEB_FEEDS: [{
+        name: '',
+        url: '',
+    }, {
+        name: '',
+        url: '',
+    }]
+};
+
+module.exports = Config;
