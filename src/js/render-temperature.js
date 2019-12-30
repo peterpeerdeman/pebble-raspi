@@ -15,7 +15,7 @@ var RenderTemperature = function() {
     temperatureMenu.on('select', function(e) {
         if(e.itemIndex === 0) {
             // currentoutside
-            raspi.get('weather/measurements/last', function(data) {
+            raspi.ajax('weather/measurements/last', function(data) {
                 var currenttemp = new UI.Card({
                     title: data.results[0].series[0].values[0][1] + '° celsius',
                     subtitle: new Date(data.results[0].series[0].values[0][0]).toLocaleString('nl')
@@ -24,7 +24,7 @@ var RenderTemperature = function() {
             });
         } else if (e.itemIndex === 1) {
             // dayoutside
-            raspi.get('weather/measurements', function(data) {
+            raspi.ajax('weather/measurements', function(data) {
                 var resultsMenu = new UI.Menu({
                     sections: [{
                         title: 'Outside temperatures',

@@ -3,16 +3,20 @@ var Config = require('config');
 var Vibe = require('ui/vibe');
 
 var raspi = {
-    get: function(url, callback) {
-        ajax({
+    get: function(url, callback, method) {
+        var config = {
             url: Config.RASPAPI_URL + '/api/' + url,
             type:'json',
             headers: {
                 'Authorization': Config.RASPAPI_AUTHHEADER
             }
-        },
-        callback,
-        function(error) {
+        };
+
+        if(method) {
+            config.method = method;
+        }
+
+        ajax(config, callback, function(error) {
             console.log(error);
             Vibe.vibrate('double');
         });

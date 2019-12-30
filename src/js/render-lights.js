@@ -31,7 +31,7 @@ var RenderLegacy = function() {
     legacyMenu.on('select', function(e) {
         if(e.itemIndex === 0) {
             // lights status
-            raspi.get('lights/lights', function(data) {
+            raspi.ajax('lights/lights', function(data) {
                 var resultsMenu = new UI.Menu({
                     sections: [{
                         title: 'Lights',
@@ -47,37 +47,37 @@ var RenderLegacy = function() {
             });
         } else if(e.itemIndex === 1) {
             // lights on
-            raspi.get('lights/on', function(data) {
+            raspi.ajax('lights/on', function(data) {
                 Vibe.vibrate('short');
             });
         } else if (e.itemIndex === 2) {
             // lights off
-            raspi.get('lights/off', function(data) {
+            raspi.ajax('lights/off', function(data) {
                 Vibe.vibrate('short');
             });
         } else if (e.itemIndex === 3) {
             // lights off
-            raspi.get('lights/randomcolor', function(data) {
+            raspi.ajax('lights/randomcolor', function(data) {
                 Vibe.vibrate('short');
             });
         } else if (e.itemIndex === 4) {
-            raspi.get('lights/randomcolors', function(data) {
+            raspi.ajax('lights/randomcolors', function(data) {
                 Vibe.vibrate('short');
             });
         } else if (e.itemIndex === 5) {
-            raspi.get('lights/colorloop', function(data) {
+            raspi.ajax('lights/colorloop', function(data) {
                 Vibe.vibrate('short');
             });
         } else if (e.itemIndex === 6) {
-            raspi.get('lights/brightness/inc', function(data) {
+            raspi.ajax('lights/brightness/inc', function(data) {
                 Vibe.vibrate('short');
             });
         } else if (e.itemIndex === 7) {
-            raspi.get('lights/brightness/dec', function(data) {
+            raspi.ajax('lights/brightness/dec', function(data) {
                 Vibe.vibrate('short');
             });
         } else if (e.itemIndex === 8) {
-            raspi.get('lights/scenes', function(data) {
+            raspi.ajax('lights/scenes', function(data) {
                 var resultsMenu = new UI.Menu({
                     sections: [{
                         title: 'Scenes',
@@ -90,7 +90,7 @@ var RenderLegacy = function() {
                     }]
                 });
                 resultsMenu.on('select', function(e) {
-                    raspi.get('lights/scenes/' + encodeURIComponent(e.item.id) + '/activate', function(data) {
+                    raspi.ajax('lights/scenes/' + encodeURIComponent(e.item.id) + '/activate', function(data) {
                         Vibe.vibrate('short');
                     });
                 });
@@ -102,7 +102,7 @@ var RenderLegacy = function() {
 };
 
 var RenderGroups = function(groups) {
-    raspi.get('lights/groups', function(groups) {
+    raspi.ajax('lights/groups', function(groups) {
         var groupsMenu = new UI.Menu({
             sections: [{
                 title: 'Rooms',
@@ -117,7 +117,7 @@ var RenderGroups = function(groups) {
         });
         groupsMenu.on('select', function(e) {
             // enable group
-            raspi.get('lights/groups/' + e.item._id + '/on', function(data) {
+            raspi.ajax('lights/groups/' + e.item._id + '/on', function(data) {
                 Vibe.vibrate('short');
                 groupsMenu.hide();
             });
@@ -125,7 +125,7 @@ var RenderGroups = function(groups) {
 
         groupsMenu.on('longSelect', function(e) {
             // disable group
-            raspi.get('lights/groups/' + e.item._id + '/off', function(data) {
+            raspi.ajax('lights/groups/' + e.item._id + '/off', function(data) {
                 Vibe.vibrate('long');
                 groupsMenu.hide();
             });

@@ -15,7 +15,7 @@ var RenderTop = function() {
     topMenu.on('select', function(e) {
         if(e.itemIndex === 0) {
             // cpu
-            raspi.get('top/cpu', function(data) {
+            raspi.ajax('top/cpu', function(data) {
                 var resultsMenu = new UI.Menu({
                     sections: [{
                         title: 'CPU',
@@ -31,7 +31,7 @@ var RenderTop = function() {
             });
         } else if (e.itemIndex === 1) {
             // cpu
-            raspi.get('top/disk', function(data) {
+            raspi.ajax('top/disk', function(data) {
                 var resultsMenu = new UI.Menu({
                     sections: [{
                         title: 'DISK',
