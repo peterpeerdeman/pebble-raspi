@@ -52,7 +52,7 @@ var RenderThermostat = function() {
         });
         zonesMenu.on('longSelect', function(e) {
             // disable temperature overlay
-            raspi.ajax('lights/zones/' + e.item.zoneId + '/overlay', function(data) {
+            raspi.ajax('thermostat/zones/' + e.item.zoneId + '/overlay', function(data) {
                 Vibe.vibrate('long');
                 zonesMenu.hide();
             }, 'delete');
