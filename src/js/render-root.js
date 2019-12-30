@@ -2,6 +2,7 @@ var UI = require('ui');
 
 var RenderHome = require('render-home');
 var RenderWork = require('render-work');
+var RenderCar = require('render-car');
 var RenderProjects = require('render-projects');
 var RenderWeb = require('render-web');
 
@@ -13,6 +14,8 @@ var RenderRoot = function(Settings) {
                 title: 'Home'
             },{
                 title: 'Work'
+            },{
+                title: 'Car'
             },{
                 title: 'Projects'
             },{
@@ -28,8 +31,10 @@ var RenderRoot = function(Settings) {
         } else if ( e.itemIndex === 1) {
             RenderWork(Settings);
         } else if ( e.itemIndex === 2) {
-            RenderProjects();
+            RenderCar();
         } else if ( e.itemIndex === 3) {
+            RenderProjects();
+        } else if ( e.itemIndex === 4) {
             RenderWeb();
         }
     });
