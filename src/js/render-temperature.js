@@ -1,6 +1,4 @@
-var Config = require('config');
 var UI = require('ui');
-var ajax = require('ajax');
 var raspi = require('raspi');
 
 var RenderTemperature = function() {
