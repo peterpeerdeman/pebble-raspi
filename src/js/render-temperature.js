@@ -1,14 +1,15 @@
 var Config = require('config');
 var UI = require('ui');
 var ajax = require('ajax');
+var raspi = require('raspi');
 
 var RenderTemperature = function() {
     var temperatureMenu = new UI.Menu({
         sections: [{
             items: [{
-                title: 'current temp outside'
+                title: 'current outside'
             },{
-                title: 'day temp outside'
+                title: 'day outside'
             }]
         }]
     });
@@ -16,37 +17,23 @@ var RenderTemperature = function() {
     temperatureMenu.on('select', function(e) {
         if(e.itemIndex === 0) {
             // currentoutside
-            ajax({
-                url: Config.RASPAPI_URL + '/api/weather/temperatures?location=outside&limit=1',
-                type:'json',
-                headers: {
-                    'Authorization': Config.RASPAPI_AUTHHEADER
-                }
-            }, function(data) {
+            raspi.get('weather/measurements/last', function(data) {
                 var currenttemp = new UI.Card({
-                    title: data[0].temperature + '° celsius',
-                    subtitle: new Date(data[0].date).toLocaleString('nl')
+                    title: data.results[0].series[0].values[0][1] + '° celsius',
+                    subtitle: new Date(data.results[0].series[0].values[0][0]).toLocaleString('nl')
                 });
-
                 currenttemp.show();
-            }
-            );
+            });
         } else if (e.itemIndex === 1) {
             // dayoutside
-            ajax({
-                url: Config.RASPAPI_URL + '/api/weather/temperatures?location=outside',
-                type:'json',
-                headers: {
-                    'Authorization': Config.RASPAPI_AUTHHEADER
-                }
-            }, function(data) {
+            raspi.get('weather/measurements', function(data) {
                 var resultsMenu = new UI.Menu({
                     sections: [{
                         title: 'Outside temperatures',
-                        items: data.map(function(item) {
+                        items: data.results[0].series[0].values.map(function(item) {
                             return {
-                                title: item.temperature + '° celsius',
-                                subtitle: new Date(item.date).toLocaleString('nl')
+                                title: item[1] + '° celsius',
+                                subtitle: new Date(item[0]).toLocaleString('nl')
                             };
                         })
                     }]
