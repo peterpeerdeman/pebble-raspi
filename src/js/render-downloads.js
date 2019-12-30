@@ -17,8 +17,8 @@ var RenderDownloads = function() {
         for(var i = 0; i < data.length; i++) {
             downloadItems.push({
                 title: data[i].name,
-                subtitle: 's: ' + data[i].seeders + ' date: ' + new Date(data[i].uploadDate).toLocaleString('nl'),
-                magnetLink: data[i].magnetLink
+                //subtitle: 's: ' + data[i].seeders + ' date: ' + new Date(data[i].uploadDate).toLocaleString('nl'),
+                torrentLink: data[i].url
             });
         }
         var availableDownloadsMenu = new UI.Menu({
@@ -35,20 +35,32 @@ var RenderDownloads = function() {
         });
 
         availableDownloadsMenu.on('longSelect', function(e) {
-            var magnetLink = e.item.magnetLink;
+            var torrentLink = e.item.torrentLink;
             ajax({
-                url: Config.RASPAPI_URL + '/api/downloads/add-url',
+                url: Config.RASPAPI_URL + '/api/downloads/getmagnet',
                 type:'json',
                 headers: {
                     'Authorization': Config.RASPAPI_AUTHHEADER
                 },
                 method: 'post',
                 data: {
-                    url: magnetLink
+                    url: torrentLink
                 }
             }, function (data) {
-                Vibe.vibrate('short');
-                availableDownloadsMenu.hide();
+                ajax({
+                    url: Config.RASPAPI_URL + '/api/downloads/add-url',
+                    type:'json',
+                    headers: {
+                        'Authorization': Config.RASPAPI_AUTHHEADER
+                    },
+                    method: 'post',
+                    data: {
+                        url: data.magnet
+                    }
+                }, function (data) {
+                    Vibe.vibrate('short');
+                    availableDownloadsMenu.hide();
+                });
             });
         });
         availableDownloadsMenu.show();
