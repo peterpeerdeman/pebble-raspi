@@ -2,6 +2,7 @@ var UI = require('ui');
 var Feature = require('platform/feature');
 
 var RenderLights = require('render-lights');
+var RenderThermostat = require('render-thermostat');
 var RenderSolar = require('render-solar');
 var RenderMusic = require('render-music');
 var RenderTemperature = require('render-temperature');
@@ -16,6 +17,8 @@ var RenderHome = function() {
         sections: [{
             items: [{
                 title: 'Lights',
+            },{
+                title: 'Thermostat',
             },{
                 title: 'Solar',
             },{
@@ -35,16 +38,18 @@ var RenderHome = function() {
         if ( e.itemIndex === 0) {
             RenderLights();
         } else if ( e.itemIndex === 1) {
-            RenderSolar();
+            RenderThermostat();
         } else if ( e.itemIndex === 2) {
-            RenderMusic();
+            RenderSolar();
         } else if ( e.itemIndex === 3) {
-            RenderTemperature();
+            RenderMusic();
         } else if ( e.itemIndex === 4) {
-            RenderTOP();
+            RenderTemperature();
         } else if ( e.itemIndex === 5) {
-            RenderMediaplayer();
+            RenderTOP();
         } else if ( e.itemIndex === 6) {
+            RenderMediaplayer();
+        } else if ( e.itemIndex === 7) {
             RenderDownloads();
         }
     });
