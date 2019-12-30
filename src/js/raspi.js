@@ -3,7 +3,7 @@ var Config = require('config');
 var Vibe = require('ui/vibe');
 
 var raspi = {
-    get: function(url, callback, method) {
+    ajax: function(url, callback, method) {
         var config = {
             url: Config.RASPAPI_URL + '/api/' + url,
             type:'json',
