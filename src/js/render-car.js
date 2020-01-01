@@ -16,7 +16,6 @@ var RenderCar = function() {
             raspi.ajax('car/charge', function(data) {
                 var resultcard = new UI.Card({
                     title: data.results[0].series[0].values[0][1] + '%, ' + data.results[0].series[0].values[0][2].toFixed(2) + 'km',
-                    subtitle: new Date(data.results[0].series[0].values[0][0]).toLocaleString('nl')
                 });
                 resultcard.show();
             });

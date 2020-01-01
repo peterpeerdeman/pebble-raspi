@@ -27,6 +27,7 @@ var RenderTemperaturesMenu = function(e) {
         raspi.ajax('thermostat/zones/' + e.item.zoneId + '/overlay?temperature=' + e.item.temperature, function(data) {
             Vibe.vibrate('long');
             temperaturesMenu.hide();
+            RenderThermostat();
         }, 'post');
     });
     temperaturesMenu.show();
@@ -55,6 +56,7 @@ var RenderThermostat = function() {
             raspi.ajax('thermostat/zones/' + e.item.zoneId + '/overlay', function(data) {
                 Vibe.vibrate('long');
                 zonesMenu.hide();
+                RenderThermostat();
             }, 'delete');
         });
         zonesMenu.show();

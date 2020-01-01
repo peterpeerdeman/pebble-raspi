@@ -17,7 +17,7 @@ var RenderTemperature = function() {
             // currentoutside
             raspi.ajax('weather/measurements/last', function(data) {
                 var currenttemp = new UI.Card({
-                    title: data.results[0].series[0].values[0][1] + '° celsius',
+                    title: data.results[0].series[0].values[0][1].toFixed(2) + '° celsius',
                     subtitle: new Date(data.results[0].series[0].values[0][0]).toLocaleString('nl')
                 });
                 currenttemp.show();
@@ -30,7 +30,7 @@ var RenderTemperature = function() {
                         title: 'Outside temperatures',
                         items: data.results[0].series[0].values.map(function(item) {
                             return {
-                                title: item[1] + '° celsius',
+                                title: item[1] ? item[1].toFixed(2) : '?' + '° celsius',
                                 subtitle: new Date(item[0]).toLocaleString('nl')
                             };
                         })
